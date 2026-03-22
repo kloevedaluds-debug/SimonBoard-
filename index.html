@@ -238,11 +238,11 @@
   async function fetchFeed(feed) {
     const el = document.getElementById(feed.id);
     try {
-      const proxy = `https://api.allorigins.win/get?url=${encodeURIComponent(feed.rss)}`;
+      const proxy = `https://corsproxy.io/?${encodeURIComponent(feed.rss)}`;
       const res = await fetch(proxy);
-      const json = await res.json();
+      const text = await res.text();
       const parser = new DOMParser();
-      const xml = parser.parseFromString(json.contents, 'text/xml');
+      const xml = parser.parseFromString(text, 'text/xml');
       const items = [...xml.querySelectorAll('item')].slice(0, 5);
       if (!items.length) { el.innerHTML = `<div class="error">Ingen nyheder fundet</div>`; return; }
       el.innerHTML = items.map(item => {
