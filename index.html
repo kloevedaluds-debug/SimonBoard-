@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Simons Dashboard</title>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #0f0f13;
+      --card: #17171e;
+      --card2: #1e1e27;
+      --border: #2a2a35;
+      --accent: #e8ff47;
+      --accent2: #47c2ff;
+      --accent3: #ff6b6b;
+      --text: #f0f0f0;
+      --muted: #6b6b80;
+    }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      padding: 24px 20px 48px;
+    }
+
+    header {
+      max-width: 1100px;
+      margin: 0 auto 32px;
+      display: flex;
+      align-items: flex-end;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+
+    .header-left h1 {
+      font-family: 'Syne', sans-serif;
+      font-size: 2.2rem;
+      font-weight: 800;
+      letter-spacing: -1px;
+      color: var(--accent);
+    }
+
+    .header-left p { color: var(--muted); font-size: 0.9rem; margin-top: 2px; }
+
+    #clock {
+      font-family: 'Syne', sans-serif;
+      font-size: 1.8rem;
+      font-weight: 700;
+      color: var(--text);
+      text-align: right;
+    }
+
+    #clock span {
+      display: block;
+      font-family: 'Inter', sans-serif;
+      font-size: 0.8rem;
+      font-weight: 400;
+      color: var(--muted);
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+      gap: 20px;
+      max-width: 1100px;
+      margin: 0 auto;
+    }
+
+    .section {
+      background: var(--card);
+      border-radius: 16px;
+      border: 1px solid var(--border);
+      overflow: hidden;
+    }
+
+    .section-header {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 16px 20px;
+      border-bottom: 1px solid var(--border);
+      background: var(--card2);
+    }
+
+    .section-title {
+      font-family: 'Syne', sans-serif;
+      font-size: 1rem;
+      font-weight: 700;
+    }
+
+    .section-dot {
+      width: 8px; height: 8px;
+      border-radius: 50%;
+      margin-left: auto;
+      animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
+
+    .cars .section-dot { background: var(--accent); }
+    .ev .section-dot { background: #4ade80; }
+    .tech .section-dot { background: var(--accent2); }
+    .gadgets .section-dot { background: var(--accent3); }
+
+    .article {
+      display: block;
+      padding: 12px 20px;
+      border-bottom: 1px solid var(--border);
+      text-decoration: none;
+      color: var(--text);
+      transition: background 0.15s;
+    }
+
+    .article:last-child { border-bottom: none; }
+    .article:hover { background: var(--card2); }
+
+    .article-title { font-size: 0.9rem; font-weight: 500; line-height: 1.4; margin-bottom: 6px; }
+
+    .article-meta { display: flex; gap: 10px; font-size: 0.75rem; color: var(--muted); }
+
+    .article-source { color: var(--accent2); font-weight: 600; }
+
+    .loading, .error {
+      padding: 24px 20px;
+      text-align: center;
+      color: var(--muted);
+      font-size: 0.85rem;
+    }
+
+    .error { color: #ff6b6b; }
+
+    .spinner {
+      width: 20px; height: 20px;
+      border: 2px solid var(--border);
+      border-top-color: var(--accent);
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+      margin: 0 auto 8px;
+    }
+
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    .refresh-bar { max-width: 1100px; margin: 20px auto 0; text-align: center; }
+
+    .refresh-btn {
+      background: none;
+      border: 1px solid var(--border);
+      color: var(--muted);
+      font-family: 'Inter', sans-serif;
+      font-size: 0.8rem;
+      padding: 8px 20px;
+      border-radius: 30px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .refresh-btn:hover { border-color: var(--accent); color: var(--accent); }
+
+    @media (max-width: 500px) {
+      header { flex-direction: column; align-items: flex-start; }
+      #clock { text-align: left; }
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <div class="header-left">
+    <h1>Simons Dashboard</h1>
+    <p>Seneste nyheder om biler & tech</p>
+  </div>
+  <div id="clock"></div>
+</header>
+
+<div class="grid">
+  <div class="section cars">
+    <div class="section-header">
+      <span>🚗</span>
+      <span class="section-title">Biler</span>
+      <div class="section-dot"></div>
+    </div>
+    <div id="cars-articles"><div class="loading"><div class="spinner"></div>Henter nyheder...</div></div>
+  </div>
+
+  <div class="section ev">
+    <div class="section-header">
+      <span>⚡</span>
+      <span class="section-title">Elbiler</span>
+      <div class="section-dot"></div>
+    </div>
+    <div id="ev-articles"><div class="loading"><div class="spinner"></div>Henter nyheder...</div></div>
+  </div>
+
+  <div class="section tech">
+    <div class="section-header">
+      <span>🤖</span>
+      <span class="section-title">AI & Tech</span>
+      <div class="section-dot"></div>
+    </div>
+    <div id="tech-articles"><div class="loading"><div class="spinner"></div>Henter nyheder...</div></div>
+  </div>
+
+  <div class="section gadgets">
+    <div class="section-header">
+      <span>📱</span>
+      <span class="section-title">Gadgets</span>
+      <div class="section-dot"></div>
+    </div>
+    <div id="gadgets-articles"><div class="loading"><div class="spinner"></div>Henter nyheder...</div></div>
+  </div>
+</div>
+
+<div class="refresh-bar">
+  <button class="refresh-btn" onclick="fetchAll()">↺ Opdater nyheder</button>
+</div>
+
+<script>
+  const FEEDS = [
+    { id: 'cars-articles', source: 'Motor Trend', rss: 'https://www.motortrend.com/rss/' },
+    { id: 'ev-articles', source: 'Electrek', rss: 'https://electrek.co/feed/' },
+    { id: 'tech-articles', source: 'TechCrunch', rss: 'https://techcrunch.com/feed/' },
+    { id: 'gadgets-articles', source: 'The Verge', rss: 'https://www.theverge.com/rss/index.xml' },
+  ];
+
+  function timeAgo(dateStr) {
+    const diff = (Date.now() - new Date(dateStr)) / 1000;
+    if (diff < 3600) return Math.floor(diff / 60) + ' min siden';
+    if (diff < 86400) return Math.floor(diff / 3600) + ' timer siden';
+    return Math.floor(diff / 86400) + ' dage siden';
+  }
+
+  async function fetchFeed(feed) {
+    const el = document.getElementById(feed.id);
+    try {
+      const proxy = `https://api.allorigins.win/get?url=${encodeURIComponent(feed.rss)}`;
+      const res = await fetch(proxy);
+      const json = await res.json();
+      const parser = new DOMParser();
+      const xml = parser.parseFromString(json.contents, 'text/xml');
+      const items = [...xml.querySelectorAll('item')].slice(0, 5);
+      if (!items.length) { el.innerHTML = `<div class="error">Ingen nyheder fundet</div>`; return; }
+      el.innerHTML = items.map(item => {
+        const title = item.querySelector('title')?.textContent || '';
+        const link = item.querySelector('link')?.textContent || '#';
+        const pubDate = item.querySelector('pubDate')?.textContent || '';
+        return `<a class="article" href="${link}" target="_blank" rel="noopener"><div class="article-title">${title}</div><div class="article-meta"><span class="article-source">${feed.source}</span><span>${pubDate ? timeAgo(pubDate) : ''}</span></div></a>`;
+      }).join('');
+    } catch (e) {
+      el.innerHTML = `<div class="error">⚠️ Kunne ikke hente nyheder</div>`;
+    }
+  }
+
+  function fetchAll() {
+    FEEDS.forEach(f => {
+      document.getElementById(f.id).innerHTML = '<div class="loading"><div class="spinner"></div>Henter nyheder...</div>';
+      fetchFeed(f);
+    });
+  }
+
+  function updateClock() {
+    const now = new Date();
+    const time = now.toLocaleTimeString('da-DK', { hour: '2-digit', minute: '2-digit' });
+    const date = now.toLocaleDateString('da-DK', { weekday: 'long', day: 'numeric', month: 'long' });
+    document.getElementById('clock').innerHTML = `${time}<span>${date}</span>`;
+  }
+
+  updateClock();
+  setInterval(updateClock, 1000);
+  fetchAll();
+</script>
+</body>
+</html>
