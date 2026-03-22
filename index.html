@@ -222,10 +222,10 @@
 
 <script>
   const FEEDS = [
-    { id: 'cars-articles', source: 'Motor Trend', rss: 'https://www.motortrend.com/rss/' },
-    { id: 'ev-articles', source: 'Electrek', rss: 'https://electrek.co/feed/' },
-    { id: 'tech-articles', source: 'TechCrunch', rss: 'https://techcrunch.com/feed/' },
-    { id: 'gadgets-articles', source: 'The Verge', rss: 'https://www.theverge.com/rss/index.xml' },
+    { id: 'cars-articles', source: 'Motor Trend', api: 'https://simonboard-api.fly.dev/feed/cars' },
+    { id: 'ev-articles', source: 'Electrek', api: 'https://simonboard-api.fly.dev/feed/ev' },
+    { id: 'tech-articles', source: 'TechCrunch', api: 'https://simonboard-api.fly.dev/feed/tech' },
+    { id: 'gadgets-articles', source: 'The Verge', api: 'https://simonboard-api.fly.dev/feed/gadgets' },
   ];
 
   function timeAgo(dateStr) {
@@ -238,8 +238,7 @@
   async function fetchFeed(feed) {
     const el = document.getElementById(feed.id);
     try {
-      const proxy = `https://corsproxy.io/?${encodeURIComponent(feed.rss)}`;
-      const res = await fetch(proxy);
+      const res = await fetch(feed.api);
       const text = await res.text();
       const parser = new DOMParser();
       const xml = parser.parseFromString(text, 'text/xml');
